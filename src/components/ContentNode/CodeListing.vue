@@ -22,6 +22,7 @@
     >{{ fileName }}
     </Filename>
     <div class="container-general">
+      <button class="copy-button" @click="copyToClipboard">Copy</button>
       <!-- Do not add newlines in <pre>, as they'll appear in the rendered HTML. -->
       <pre><CodeBlock><template
         v-for="(line, index) in syntaxHighlightedLines"
@@ -121,6 +122,13 @@ export default {
       this.syntaxHighlightedLines = lines.map(line => (
         line === '' ? '\n' : line
       ));
+    },
+    copyToClipboard() {
+      const lines = this.content;
+      const text = lines.join('\n');
+      navigator.clipboard.writeText(text)
+        .then(() => console.log('Copied!'))
+        .catch(err => console.error('Failed to copy: ', err));
     },
   },
 };
