@@ -22,7 +22,32 @@
     >{{ fileName }}
     </Filename>
     <div class="container-general">
-      <button class="copy-button" @click="copyToClipboard">Copy</button>
+      <button
+        class="copy-button"
+        :class="{ copied: isCopied }"
+        @click="copyToClipboard"
+        aria-label="Copy code to clipboard"
+      >
+        <svg
+          v-if="!isCopied"
+          xmlns="http://www.w3.org/2000/svg"
+          viewbox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="currentColor"
+        ><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2
+          2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+        <svg
+          v-if="isCopied"
+          xmlns="http://www.w3.org/2000/svg"
+          viewbox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="currentColor"
+        ><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+        </svg>
+      </button>
       <!-- Do not add newlines in <pre>, as they'll appear in the rendered HTML. -->
       <pre><CodeBlock><template
         v-for="(line, index) in syntaxHighlightedLines"
@@ -56,6 +81,7 @@ export default {
   data() {
     return {
       syntaxHighlightedLines: [],
+      isCopied: false,
     };
   },
   props: {
@@ -127,8 +153,15 @@ export default {
       const lines = this.content;
       const text = lines.join('\n');
       navigator.clipboard.writeText(text)
-        .then(() => console.log('Copied!'))
-        .catch(err => console.error('Failed to copy: ', err));
+        .then(() => {
+          this.isCopied = true;
+          setTimeout(() => {
+            this.isCopied = false;
+          }, 1000);
+        })
+        .catch(err => (
+          console.error('Failed to copy text: ', err)
+        ));
     },
   },
 };
@@ -206,11 +239,47 @@ code {
 
 .container-general {
   overflow: auto;
+  position: relative;
 }
 
 .container-general,
 pre {
   flex-grow: 1;
+}
+
+.copy-button {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  background: var(--color-syntax-clipboard-bg, #e0e0e0);
+  border: none;
+  border-radius: 6px;
+  padding: 7px 6px;
+  cursor: pointer;
+  display: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.copy-button svg {
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+}
+
+.copy-button:hover {
+  background-color: var(--code-syntax-clipboard-hover-bg, #d0d0d0);
+}
+
+.copy-button:hover svg {
+  opacity: 1;
+}
+
+.copy-button.copied svg {
+  color: var(--color-syntax-clipboard-check-color, #007aff);
+}
+
+.container-general:hover .copy-button {
+  display: flex;
 }
 
 </style>
