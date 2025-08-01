@@ -251,7 +251,7 @@ pre {
   position: absolute;
   top: 1em;
   right: 1em;
-  background: var(--color-syntax-clipboard-bg, #e0e0e0);
+  background: var(--color-fill-gray-tertiary);
   border: none;
   border-radius: 6px;
   padding: 7px 6px;
@@ -267,7 +267,7 @@ pre {
 }
 
 .copy-button:hover {
-  background-color: var(--code-syntax-clipboard-hover-bg, #d0d0d0);
+  background-color: var(--color-fill-gray);
 }
 
 .copy-button:hover svg {
@@ -275,7 +275,7 @@ pre {
 }
 
 .copy-button.copied svg {
-  color: var(--color-syntax-clipboard-check-color, #007aff);
+  color: var(--color-figure-blue);
 }
 
 .container-general:hover .copy-button {
