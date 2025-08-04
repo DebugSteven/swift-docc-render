@@ -21,11 +21,14 @@
       :fileType="fileType"
     >{{ fileName }}
     </Filename>
-    <div class="container-general">
+    <div class="container-general" ref="scrollContainer">
       <button
+        v-show="showCopyButton"
         class="copy-button"
-        :class="{ copied: isCopied }"
+        ref="copyButton"
+        :class="{ copied: isCopied, visible: buttonPositioned }"
         @click="copyToClipboard"
+        @update="handleScroll"
         aria-label="Copy code to clipboard"
       >
         <svg
@@ -68,6 +71,7 @@
 </template>
 
 <script>
+import debounce from 'docc-render/utils/debounce';
 import { escapeHtml } from 'docc-render/utils/strings';
 import Language from 'docc-render/constants/Language';
 import CodeBlock from 'docc-render/components/CodeBlock.vue';
@@ -82,7 +86,19 @@ export default {
     return {
       syntaxHighlightedLines: [],
       isCopied: false,
+      showCopyButton: true,
+      buttonPositioned: false,
+      scrollTimeout: null,
     };
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.updateCopyButtonPosition();
+      const container = this.$refs.scrollContainer;
+      if (container) {
+        container.addEventListener('scroll', this.handleScroll, { passive: true });
+      }
+    });
   },
   props: {
     fileName: String,
@@ -149,6 +165,29 @@ export default {
         line === '' ? '\n' : line
       ));
     },
+    updateCopyButtonPosition() {
+      const container = this.$refs.scrollContainer;
+      const button = this.$refs.copyButton;
+
+      if (!container || !button) return;
+
+      const { scrollLeft } = container;
+
+      button.style.transform = `translateX(${scrollLeft}px)`;
+      this.buttonPositioned = true;
+    },
+    handleScroll: debounce(function handleScroll() {
+      this.showCopyButton = false;
+      this.updateCopyButtonPosition();
+
+      if (this.scrollTimeout) {
+        clearTimeout(this.scrollTimeout);
+      }
+
+      this.scrollTimeout = window.setTimeout(() => {
+        this.showCopyButton = true;
+      }, 500);
+    }, 100),
     copyToClipboard() {
       const lines = this.content;
       const text = lines.join('\n');
@@ -249,15 +288,21 @@ pre {
 
 .copy-button {
   position: absolute;
-  top: 1em;
-  right: 1em;
+  top: 0.5em;
+  right: 0.5em;
+  transform: translateX(0);
   background: var(--color-fill-gray-tertiary);
   border: none;
   border-radius: 6px;
   padding: 7px 6px;
   cursor: pointer;
   display: none;
+  opacity: 0;
   transition: all 0.2s ease-in-out;
+}
+
+.copy-button.visible {
+  opacity: 1;
 }
 
 .copy-button svg {
