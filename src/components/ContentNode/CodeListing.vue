@@ -23,11 +23,12 @@
     </Filename>
     <div class="container-general" ref="scrollContainer">
       <button
+        v-if="copyToClipboard"
         v-show="showCopyButton"
         class="copy-button"
         ref="copyButton"
         :class="{ copied: isCopied, visible: buttonPositioned }"
-        @click="copyToClipboard"
+        @click="copyCodeToClipboard"
         @update="handleScroll"
         aria-label="Copy code to clipboard"
       >
@@ -112,6 +113,10 @@ export default {
       type: Array,
       required: true,
     },
+    copyToClipboard: {
+      type: Boolean,
+      required: true,
+    },
     startLineNumber: {
       type: Number,
       default: () => 1,
@@ -188,7 +193,7 @@ export default {
         this.showCopyButton = true;
       }, 500);
     }, 100),
-    copyToClipboard() {
+    copyCodeToClipboard() {
       const lines = this.content;
       const text = lines.join('\n');
       navigator.clipboard.writeText(text)
