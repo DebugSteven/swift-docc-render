@@ -254,21 +254,20 @@ pre {
 
 .copy-button {
   position: absolute;
-  top: 0.5em;
-  right: 0.5em;
-  transform: translateX(0);
+  top: 0.2em;
+  right: 0.2em;
+  width: 24px;
+  height: 24px;
   background: var(--color-fill-gray-tertiary);
   border: none;
-  border-radius: 6px;
-  padding: 7px 6px;
+  border-radius: 4px;
+  padding: 4px;
   cursor: pointer;
   opacity: 1;
   transition: all 0.2s ease-in-out;
 }
 
 .copy-button svg {
-  width: 24px;
-  height: 24px;
   opacity: 0.8;
 }
 
