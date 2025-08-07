@@ -21,15 +21,12 @@
       :fileType="fileType"
     >{{ fileName }}
     </Filename>
-    <div class="container-general" ref="scrollContainer">
+    <div class="container-general">
       <button
         v-if="copyToClipboard"
-        v-show="showCopyButton"
         class="copy-button"
-        ref="copyButton"
-        :class="{ copied: isCopied, visible: buttonPositioned }"
+        :class="{ copied: isCopied }"
         @click="copyCodeToClipboard"
-        @update="handleScroll"
         aria-label="Copy code to clipboard"
       >
         <svg
@@ -72,7 +69,6 @@
 </template>
 
 <script>
-import debounce from 'docc-render/utils/debounce';
 import { escapeHtml } from 'docc-render/utils/strings';
 import Language from 'docc-render/constants/Language';
 import CodeBlock from 'docc-render/components/CodeBlock.vue';
@@ -87,19 +83,7 @@ export default {
     return {
       syntaxHighlightedLines: [],
       isCopied: false,
-      showCopyButton: true,
-      buttonPositioned: false,
-      scrollTimeout: null,
     };
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.updateCopyButtonPosition();
-      const container = this.$refs.scrollContainer;
-      if (container) {
-        container.addEventListener('scroll', this.handleScroll, { passive: true });
-      }
-    });
   },
   props: {
     fileName: String,
@@ -170,29 +154,6 @@ export default {
         line === '' ? '\n' : line
       ));
     },
-    updateCopyButtonPosition() {
-      const container = this.$refs.scrollContainer;
-      const button = this.$refs.copyButton;
-
-      if (!container || !button) return;
-
-      const { scrollLeft } = container;
-
-      button.style.transform = `translateX(${scrollLeft}px)`;
-      this.buttonPositioned = true;
-    },
-    handleScroll: debounce(function handleScroll() {
-      this.showCopyButton = false;
-      this.updateCopyButtonPosition();
-
-      if (this.scrollTimeout) {
-        clearTimeout(this.scrollTimeout);
-      }
-
-      this.scrollTimeout = window.setTimeout(() => {
-        this.showCopyButton = true;
-      }, 500);
-    }, 100),
     copyCodeToClipboard() {
       const lines = this.content;
       const text = lines.join('\n');
@@ -272,6 +233,7 @@ code {
   flex-direction: column;
   border-radius: var(--code-border-radius, $border-radius);
   overflow: hidden;
+  position: relative;
   // we need to establish a new stacking context to resolve a Safari bug where
   // the scrollbar is not clipped by this element depending on its border-radius
   @include new-stacking-context;
@@ -283,7 +245,6 @@ code {
 
 .container-general {
   overflow: auto;
-  position: relative;
 }
 
 .container-general,
@@ -301,13 +262,8 @@ pre {
   border-radius: 6px;
   padding: 7px 6px;
   cursor: pointer;
-  display: none;
-  opacity: 0;
-  transition: all 0.2s ease-in-out;
-}
-
-.copy-button.visible {
   opacity: 1;
+  transition: all 0.2s ease-in-out;
 }
 
 .copy-button svg {
@@ -326,10 +282,6 @@ pre {
 
 .copy-button.copied svg {
   color: var(--color-figure-blue);
-}
-
-.container-general:hover .copy-button {
-  display: flex;
 }
 
 </style>
