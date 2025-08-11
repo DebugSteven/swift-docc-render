@@ -99,7 +99,7 @@ export default {
     },
     copyToClipboard: {
       type: Boolean,
-      required: true,
+      default: () => false,
     },
     startLineNumber: {
       type: Number,
