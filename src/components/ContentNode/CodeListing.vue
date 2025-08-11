@@ -263,7 +263,7 @@ pre {
   border-radius: 4px;
   padding: 4px;
   cursor: pointer;
-  opacity: 1;
+  opacity: 0.6;
   transition: all 0.2s ease-in-out;
 }
 
