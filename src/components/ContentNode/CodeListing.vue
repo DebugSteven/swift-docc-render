@@ -1,7 +1,7 @@
 <!--
   This source file is part of the Swift.org open source project
 
-  Copyright (c) 2021-2023 Apple Inc. and the Swift project authors
+  Copyright (c) 2021-2025 Apple Inc. and the Swift project authors
   Licensed under Apache License v2.0 with Runtime Library Exception
 
   See https://swift.org/LICENSE.txt for license information
@@ -28,26 +28,10 @@
         :class="{ copied: isCopied }"
         @click="copyCodeToClipboard"
         aria-label="Copy code to clipboard"
+        title="Copy code to clipboard"
       >
-        <svg
-          v-if="!isCopied"
-          xmlns="http://www.w3.org/2000/svg"
-          viewbox="0 0 24 24"
-          width="24"
-          height="24"
-          fill="currentColor"
-        ><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2
-          2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-        </svg>
-        <svg
-          v-if="isCopied"
-          xmlns="http://www.w3.org/2000/svg"
-          viewbox="0 0 24 24"
-          width="24"
-          height="24"
-          fill="currentColor"
-        ><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-        </svg>
+        <CopyIcon v-if="!isCopied" class="copy-icon"/>
+        <CheckmarkIcon v-if="isCopied" class="checkmark-icon"/>
       </button>
       <!-- Do not add newlines in <pre>, as they'll appear in the rendered HTML. -->
       <pre><CodeBlock><template
@@ -72,13 +56,20 @@
 import { escapeHtml } from 'docc-render/utils/strings';
 import Language from 'docc-render/constants/Language';
 import CodeBlock from 'docc-render/components/CodeBlock.vue';
+import CopyIcon from 'docc-render/components/Icons/CopyIcon.vue';
+import CheckmarkIcon from 'docc-render/components/Icons/CheckmarkIcon.vue';
 import { highlightContent, registerHighlightLanguage } from 'docc-render/utils/syntax-highlight';
 
 import CodeListingFilename from './CodeListingFilename.vue';
 
 export default {
   name: 'CodeListing',
-  components: { Filename: CodeListingFilename, CodeBlock },
+  components: {
+    Filename: CodeListingFilename,
+    CodeBlock,
+    CopyIcon,
+    CheckmarkIcon,
+  },
   data() {
     return {
       syntaxHighlightedLines: [],
@@ -124,6 +115,9 @@ export default {
       const fallbackMap = { occ: Language.objectiveC.key.url };
       return fallbackMap[this.syntax] || this.syntax;
     },
+    copyableText() {
+      return this.content.join('\n');
+    },
   },
   watch: {
     content: {
@@ -155,9 +149,7 @@ export default {
       ));
     },
     copyCodeToClipboard() {
-      const lines = this.content;
-      const text = lines.join('\n');
-      navigator.clipboard.writeText(text)
+      navigator.clipboard.writeText(this.copyableText)
         .then(() => {
           this.isCopied = true;
           setTimeout(() => {
@@ -256,30 +248,44 @@ pre {
   position: absolute;
   top: 0.2em;
   right: 0.2em;
-  width: 24px;
-  height: 24px;
+  width: 1.5em;
+  height: 1.5em;
   background: var(--color-fill-gray-tertiary);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--button-border-radius, $button-radius);
   padding: 4px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: all 0.2s ease-in-out;
 }
 
-.copy-button svg {
-  opacity: 0.8;
+@media (hover: hover) {
+  .copy-button {
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .copy-button:hover {
+    background-color: var(--color-fill-gray);
+  }
+
+  .copy-button .copy-icon {
+    opacity: 0.8;
+  }
+
+  .copy-button:hover .copy-icon {
+    opacity: 1;
+  }
+
+  .container-general:hover .copy-button {
+    opacity: 1;
+  }
 }
 
-.copy-button:hover {
-  background-color: var(--color-fill-gray);
+@media (hover: none) {
+  .copy-button {
+    opacity: 1;
+  }
 }
 
-.copy-button:hover svg {
-  opacity: 1;
-}
-
-.copy-button.copied svg {
+.copy-button.copied .checkmark-icon {
   color: var(--color-figure-blue);
 }
 
