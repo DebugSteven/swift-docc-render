@@ -28,7 +28,7 @@
         :class="{ copied: isCopied }"
         @click="copyCodeToClipboard"
         aria-label="$t('icons.copy')"
-        title="Copy code to clipboard"
+        :title="$t('icons.copy')"
       >
         <CopyIcon v-if="!isCopied" class="copy-icon"/>
         <CheckmarkIcon v-if="isCopied" class="checkmark-icon"/>
