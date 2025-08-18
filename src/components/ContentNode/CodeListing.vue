@@ -27,7 +27,7 @@
         class="copy-button"
         :class="{ copied: isCopied }"
         @click="copyCodeToClipboard"
-        aria-label="Copy code to clipboard"
+        aria-label="$t('icons.copy')"
         title="Copy code to clipboard"
       >
         <CopyIcon v-if="!isCopied" class="copy-icon"/>
