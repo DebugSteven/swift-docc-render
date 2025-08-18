@@ -9,17 +9,21 @@
 -->
 
 <template>
-  <svg
+  <SVGIcon
     class="checkmark-icon"
     viewBox="0 0 24 24"
+    themeId="checkmark"
   >
     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-  </svg>
+  </SVGIcon>
 </template>
 
 <script>
+import SVGIcon from 'docc-render/components/SVGIcon.vue';
+
 export default {
   name: 'CheckmarkIcon',
+  components: { SVGIcon },
 };
 </script>
 
