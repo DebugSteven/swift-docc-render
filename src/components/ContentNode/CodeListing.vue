@@ -25,13 +25,14 @@
       <button
         v-if="copyToClipboard"
         class="copy-button"
-        :class="{ copied: isCopied }"
+        :class="copyState"
         @click="copyCodeToClipboard"
         :aria-label="$t('icons.copy')"
         :title="$t('icons.copy')"
       >
-        <CopyIcon v-if="!isCopied" class="copy-icon"/>
-        <CheckmarkIcon v-if="isCopied" class="checkmark-icon"/>
+        <CopyIcon v-if="copyState === 'idle'" class="copy-icon"/>
+        <CheckmarkIcon v-if="copyState === 'success'" class="checkmark-icon"/>
+        <CrossIcon v-if="copyState === 'failure'" class="cross-icon"/>
       </button>
       <!-- Do not add newlines in <pre>, as they'll appear in the rendered HTML. -->
       <pre><CodeBlock><template
@@ -58,6 +59,7 @@ import Language from 'docc-render/constants/Language';
 import CodeBlock from 'docc-render/components/CodeBlock.vue';
 import CopyIcon from 'docc-render/components/Icons/CopyIcon.vue';
 import CheckmarkIcon from 'docc-render/components/Icons/CheckmarkIcon.vue';
+import CrossIcon from 'docc-render/components/Icons/CrossIcon.vue';
 import { highlightContent, registerHighlightLanguage } from 'docc-render/utils/syntax-highlight';
 
 import CodeListingFilename from './CodeListingFilename.vue';
@@ -69,11 +71,12 @@ export default {
     CodeBlock,
     CopyIcon,
     CheckmarkIcon,
+    CrossIcon,
   },
   data() {
     return {
       syntaxHighlightedLines: [],
-      isCopied: false,
+      copyState: 'idle',
     };
   },
   props: {
@@ -151,14 +154,17 @@ export default {
     copyCodeToClipboard() {
       navigator.clipboard.writeText(this.copyableText)
         .then(() => {
-          this.isCopied = true;
-          setTimeout(() => {
-            this.isCopied = false;
-          }, 1000);
+          this.copyState = 'success';
         })
-        .catch(err => (
-          console.error('Failed to copy text: ', err)
-        ));
+        .catch((err) => {
+          console.error('Failed to copy text: ', err);
+          this.copyState = 'failure';
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.copyState = 'idle';
+          }, 1000);
+        });
     },
   },
 };
@@ -289,8 +295,13 @@ pre {
   fill: var(--color-figure-gray);
 }
 
-.copy-button.copied .checkmark-icon {
+.copy-button.success .checkmark-icon {
   color: var(--color-figure-blue);
+  fill: currentColor;
+}
+
+.copy-button.failure .cross-icon {
+  color: var(--color-figure-red);
   fill: currentColor;
 }
 
