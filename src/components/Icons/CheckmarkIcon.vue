@@ -10,7 +10,7 @@
 
 <template>
   <SVGIcon
-    class="checkmark-icon"
+    class="CheckmarkIcon"
     viewBox="0 0 24 24"
     themeId="checkmark"
   >
@@ -28,9 +28,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.checkmark-icon {
+.CheckmarkIcon {
   opacity: 1;
   stroke: currentColor;
-  fill: currentColor;
 }
 </style>

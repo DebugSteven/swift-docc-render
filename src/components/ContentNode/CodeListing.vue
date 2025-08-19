@@ -285,8 +285,13 @@ pre {
   }
 }
 
+.copy-button .copy-icon {
+  fill: var(--color-figure-gray);
+}
+
 .copy-button.copied .checkmark-icon {
   color: var(--color-figure-blue);
+  fill: currentColor;
 }
 
 </style>

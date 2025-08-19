@@ -10,7 +10,7 @@
 
 <template>
   <SVGIcon
-    class="copy-icon"
+    class="CopyIcon"
     viewBox="0 0 24 24"
     themeId="copy"
   >
@@ -31,8 +31,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.copy-icon {
-  fill: currentColor;
+.CopyIcon {
   opacity: 0.8;
 }
 </style>
