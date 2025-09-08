@@ -129,7 +129,7 @@ describe('CodeListing', () => {
       const codeLine = codeLineContainer.find('.code-line');
       expect(codeLine.text()).toBe(line);
 
-      expect(codeLineContainer.classes('user-highlighted')).toBe(shouldBeHighlighted);
+      expect(codeLineContainer.classes('highlighted')).toBe(shouldBeHighlighted);
     });
   });
 
@@ -164,7 +164,7 @@ describe('CodeListing', () => {
       const codeLine = codeLineContainer.find('.code-line');
       expect(codeLine.text()).toBe(line);
 
-      expect(codeLineContainer.classes('user-strikethrough')).toBe(shouldBeStriked);
+      expect(codeLineContainer.classes('strikethrough')).toBe(shouldBeStriked);
     });
   });
 
@@ -352,7 +352,7 @@ describe('CodeListing', () => {
 
     await wrapper.setProps({ wrap: 0 });
     style = wrapper.attributes('style') || '';
-    expect(style).toMatch(/--wrap-ch:\s*0\b/);
+    expect(style === null || style === '').toBe(true);
   });
 
   it('treats negative wrap as no-wrap', async () => {
