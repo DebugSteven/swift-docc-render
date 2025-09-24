@@ -114,16 +114,9 @@ export default {
       type: Number,
       default: () => 0,
     },
-    highlightedLines: {
+    lineAnnotations: {
       type: Array,
       default: () => [],
-      validator: lines => lines.every(number => Number.isInteger(number) && number > 0),
-    },
-    strikethroughLines: {
-      type: Array,
-      default: () => [],
-      validator: lines => lines.every(number => Number.isInteger(number) && number > 0),
-
     },
     startLineNumber: {
       type: Number,
@@ -162,11 +155,23 @@ export default {
     isHighlighted(index) {
       return this.highlightedLineNumbers.has(this.lineNumberFor(index));
     },
+    isLineInStyle(index, style) {
+      const lineNumber = this.lineNumberFor(index);
+
+      return this.lineAnnotations
+        .filter(a => a.style === style)
+        .some((a) => {
+          if (!a.range || !a.range[0] || !a.range[1]) return false;
+          const startLine = a.range[0].line;
+          const endLine = a.range[1].line;
+          return lineNumber >= startLine && lineNumber <= endLine;
+        });
+    },
     isUserHighlighted(index) {
-      return this.highlightedLines.includes(this.lineNumberFor(index));
+      return this.isLineInStyle(index, 'highlight');
     },
     isUserStrikethrough(index) {
-      return this.strikethroughLines.includes(this.lineNumberFor(index));
+      return this.isLineInStyle(index, 'strikeout');
     },
     // Returns the line number for the line at the given index in `content`.
     lineNumberFor(index) {

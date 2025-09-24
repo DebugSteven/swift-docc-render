@@ -276,8 +276,7 @@ function renderNode(createElement, references) {
         showLineNumbers: node.showLineNumbers,
         copyToClipboard: node.copyToClipboard ?? false,
         wrap: node.wrap ?? 0,
-        highlightedLines: node.highlight ?? [],
-        strikethroughLines: node.strikeout ?? [],
+        lineAnnotations: node.lineAnnotations ?? [],
       };
       return createElement(CodeListing, { props });
     }
