@@ -98,14 +98,19 @@ describe('CodeListing', () => {
     });
   });
 
-  it('highlights the correct lines from highlightedLines', async () => {
+  it('styles the correct lines from lineAnnotations with the specified style', async () => {
     const content = ['a', 'b', 'c', 'd', 'e'];
-    const highlightedLines = [1, 3];
+    const lineAnnotations = [
+      { style: 'highlight', range: [{ line: 1 }, { line: 1 }] },
+      { style: 'highlight', range: [{ line: 2 }, { line: 2 }] },
+      { style: 'strikeout', range: [{ line: 1 }, { line: 1 }] },
+      { style: 'strikeout', range: [{ line: 3 }, { line: 3 }] },
+    ];
 
     const wrapper = shallowMount(CodeListing, {
       propsData: {
         content,
-        highlightedLines,
+        lineAnnotations,
         showLineNumbers: true,
       },
     });
@@ -117,44 +122,17 @@ describe('CodeListing', () => {
 
     const codeLineContainers = wrapper.findAll('span.code-line-container');
     expect(codeLineContainers.length).toBe(content.length);
+
+    const highlightedLines = lineAnnotations
+      .filter(a => a.style === 'highlight')
+      .flatMap(a => a.range.map(r => r.line));
+    const strikethroughLines = lineAnnotations
+      .filter(a => a.style === 'strikeout')
+      .flatMap(a => a.range.map(r => r.line));
 
     content.forEach((line, index) => {
       const codeLineContainer = codeLineContainers.at(index);
       const shouldBeHighlighted = highlightedLines.includes(index + 1);
-
-      const codeNumber = codeLineContainer.find('.code-number');
-
-      expect(codeNumber.attributes('data-line-number')).toBe(`${index + 1}`);
-
-      const codeLine = codeLineContainer.find('.code-line');
-      expect(codeLine.text()).toBe(line);
-
-      expect(codeLineContainer.classes('highlighted')).toBe(shouldBeHighlighted);
-    });
-  });
-
-  it('strikes through the correct lines from strikethroughLines', async () => {
-    const content = ['a', 'b', 'c', 'd', 'e'];
-    const strikethroughLines = [1, 3];
-
-    const wrapper = shallowMount(CodeListing, {
-      propsData: {
-        content,
-        strikethroughLines,
-        showLineNumbers: true,
-      },
-    });
-
-    await flushPromises();
-
-    const pre = wrapper.find('pre');
-    expect(pre.exists()).toBe(true);
-
-    const codeLineContainers = wrapper.findAll('span.code-line-container');
-    expect(codeLineContainers.length).toBe(content.length);
-
-    content.forEach((line, index) => {
-      const codeLineContainer = codeLineContainers.at(index);
       const shouldBeStriked = strikethroughLines.includes(index + 1);
 
       const codeNumber = codeLineContainer.find('.code-number');
@@ -164,6 +142,7 @@ describe('CodeListing', () => {
       const codeLine = codeLineContainer.find('.code-line');
       expect(codeLine.text()).toBe(line);
 
+      expect(codeLineContainer.classes('highlighted')).toBe(shouldBeHighlighted);
       expect(codeLineContainer.classes('strikethrough')).toBe(shouldBeStriked);
     });
   });
